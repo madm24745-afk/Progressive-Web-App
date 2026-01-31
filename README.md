@@ -1,0 +1,266 @@
+[index2.html](https://github.com/user-attachments/files/24980198/index2.html)
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>แอปออมเงิน — พรีเมียม (ดำทอง)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0b0b;
+      --card:#0f0f10;
+      --muted:#bfb7b0;
+      --gold:#cfa86b; /* primary gold tone */
+      --gold-2:#e6c989;
+      --accent:#fff8f0;
+      --glass: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#060606 0%, #0b0b0b 100%);
+      color:var(--accent);
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:24px;
+    }
+    .wrap{max-width:980px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+    header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    h1{font-family:'Playfair Display',serif;margin:0;font-size:20px;letter-spacing:0.6px}
+    .brand-sub{color:var(--muted);font-size:13px}
+    .card{background:linear-gradient(180deg,var(--card),#121212);border-radius:14px;padding:18px;box-shadow:0 6px 24px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .controls{display:flex;gap:10px;flex-wrap:wrap}
+
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type=text], input[type=number], select{
+      width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--accent);outline:none
+    }
+    button{background:linear-gradient(90deg,var(--gold),var(--gold-2));border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;color:#09100a}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* progress */
+    .progress-wrap{background:rgba(255,255,255,0.03);border-radius:12px;padding:12px}
+    .progress{height:18px;background:rgba(255,255,255,0.04);border-radius:10px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-2));width:0%;transition:width 600ms cubic-bezier(.2,.9,.2,1)}
+
+    /* history */
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:8px;text-align:left;font-size:13px;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    th{color:var(--muted);font-weight:600}
+
+    /* responsive */
+    @media (max-width:900px){
+      .wrap{grid-template-columns:1fr;}
+    }
+
+    .small{font-size:12px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .danger{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px;border-radius:8px}
+    footer{grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;margin-top:14px}
+
+    /* tiny premium flourish */
+    .gold-line{height:4px;background:linear-gradient(90deg,transparent,rgba(207,168,107,0.9),transparent);border-radius:4px;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>แอปออมเงิน — พรีเมียม</h1>
+        <div class="brand-sub">โทนดำทอง • เก็บข้อมูลในเครื่อง (localStorage)</div>
+      </div>
+      <div class="small muted">ออกแบบโดย ChatGPT — โทนพรีเมียมตามที่คุณต้องการ</div>
+    </header>
+
+    <main class="card">
+      <div class="gold-line"></div>
+      <section id="target-section">
+        <h2 style="margin:0 0 8px 0;font-size:16px">สร้างเป้าหมายออม</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label>ชื่อเป้าหมาย</label>
+            <input id="target-name" type="text" placeholder="เช่น เงินดาวน์รถ, ท่องเที่ยว" />
+          </div>
+          <div>
+            <label>จำนวนเป้าหมาย (฿)</label>
+            <input id="target-amount" type="number" min="1" placeholder="100000" />
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button id="create-target">สร้างเป้าหมายใหม่</button>
+          <button id="load-target" class="danger">โหลดเป้าหมายล่าสุด</button>
+        </div>
+      </section>
+
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:16px 0" />
+
+      <section id="deposit-section" style="display:none">
+        <h3 style="margin:0 0 8px 0">อัปเดตยอดออม</h3>
+        <div style="display:grid;grid-template-columns:1fr 120px;gap:10px;align-items:end">
+          <div>
+            <label>จำนวน (฿)</label>
+            <input id="deposit-amount" type="number" min="1" placeholder="500" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button id="add-deposit">บันทึก</button>
+          </div>
+        </div>
+        <div style="margin-top:12px" class="progress-wrap card-like">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div class="muted">สถานะการออม</div>
+            <div class="muted small" id="progress-text">฿0 / ฿0 (0%)</div>
+          </div>
+          <div class="progress"><i id="progress-bar"></i></div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+          <div class="muted">ประวัติการออม</div>
+          <div class="actions">
+            <button id="export-csv" class="danger">ส่งออก CSV</button>
+            <button id="reset-target" class="danger">ลบเป้าหมาย</button>
+          </div>
+        </div>
+
+        <div style="margin-top:8px;overflow:auto;max-height:220px">
+          <table id="history-table">
+            <thead>
+              <tr><th>วันที่</th><th>จำนวน (฿)</th><th>หมายเหตุ</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <aside class="card">
+      <h3 style="margin-top:0">สรุปเป้าหมาย</h3>
+      <div style="margin-top:10px">
+        <div class="muted">ชื่อ</div>
+        <div id="summary-name" style="font-weight:600;font-size:16px;margin-bottom:8px">-</div>
+
+        <div class="muted">ยอดรวมออม</div>
+        <div id="summary-saved" style="font-weight:600;font-size:18px;margin-bottom:8px">฿0</div>
+
+        <div class="muted">เป้าหมาย</div>
+        <div id="summary-target" style="font-weight:600;font-size:16px;margin-bottom:8px">฿0</div>
+
+        <div class="muted">สถานะ</div>
+        <div id="summary-status" style="margin-bottom:6px">ยังไม่ได้เริ่ม</div>
+
+        <div style="margin-top:10px" class="muted small">ฟีเจอร์</div>
+        <ul class="muted small">
+          <li>เก็บข้อมูลในเครื่อง (localStorage)</li>
+          <li>ส่งออกไฟล์ CSV</li>
+          <li>UI พรีเมียม — โทนดำทอง</li>
+        </ul>
+      </div>
+    </aside>
+
+    <footer class="muted">หมายเหตุ: แอปนี้เก็บข้อมูลบนเครื่องของคุณเท่านั้น — หากล้างเบราว์เซอร์ข้อมูลจะหาย</footer>
+  </div>
+
+  <script>
+    // Simple savings app logic (single-file)
+    const $ = id => document.getElementById(id);
+    const lsKey = 'savings_app_v1';
+
+    // state
+    let state = { targetName: '', targetAmount: 0, history: [] };
+
+    function formatTH(num){
+      return '฿' + Number(num).toLocaleString('th-TH');
+    }
+
+    function saveState(){
+      localStorage.setItem(lsKey, JSON.stringify(state));
+    }
+    function loadState(){
+      const raw = localStorage.getItem(lsKey);
+      if(!raw) return false;
+      try{ state = JSON.parse(raw); return true }catch(e){return false}
+    }
+
+    function render(){
+      const saved = state.history.reduce((s,e)=>s+Number(e.amount),0);
+      const target = Number(state.targetAmount)||0;
+      const pct = target ? Math.min(100, Math.round((saved/target)*100)) : 0;
+
+      $('summary-name').textContent = state.targetName || '-';
+      $('summary-saved').textContent = formatTH(saved);
+      $('summary-target').textContent = formatTH(target);
+      $('summary-status').textContent = target===0? 'ยังไม่ได้ตั้งเป้าหมาย' : (saved>=target? 'บรรลุเป้าหมาย 🎉' : 'กำลังออม');
+
+      $('progress-text').textContent = `${formatTH(saved)} / ${formatTH(target)} (${pct}%)`;
+      $('progress-bar').style.width = pct + '%';
+
+      // history
+      const tbody = document.querySelector('#history-table tbody');
+      tbody.innerHTML = '';
+      state.history.slice().reverse().forEach(item=>{
+        const tr = document.createElement('tr');
+        const d = new Date(item.time).toLocaleString('th-TH');
+        tr.innerHTML = `<td>${d}</td><td>${formatTH(item.amount)}</td><td>${item.note||''}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      // toggle deposit section
+      if(state.targetAmount>0){
+        $('deposit-section').style.display = 'block';
+      }else{
+        $('deposit-section').style.display = 'none';
+      }
+    }
+
+    // events
+    $('create-target').addEventListener('click', ()=>{
+      const name = $('target-name').value.trim();
+      const amt = Number($('target-amount').value) || 0;
+      if(!name || amt<=0){
+        alert('กรุณากรอกชื่อเป้าหมายและจำนวนเป้าหมายเป็นเลขบวก');
+        return;
+      }
+      state.targetName = name; state.targetAmount = amt; state.history = [];
+      saveState(); render();
+    });
+
+    $('load-target').addEventListener('click', ()=>{
+      const ok = loadState();
+      if(!ok){ alert('ไม่พบข้อมูลเก่าในเครื่องของคุณ'); return; }
+      render();
+    });
+
+    $('add-deposit').addEventListener('click', ()=>{
+      const amt = Number($('deposit-amount').value) || 0;
+      if(amt<=0){ alert('กรุณากรอกจำนวนมากกว่า 0'); return; }
+      const note = prompt('หมายเหตุสั้น ๆ (ไม่บังคับ):','') || '';
+      state.history.push({ amount: amt, note, time: new Date().toISOString() });
+      saveState(); render();
+      $('deposit-amount').value = '';
+    });
+
+    $('reset-target').addEventListener('click', ()=>{
+      if(!confirm('ต้องการลบเป้าหมายและประวัติทั้งหมดใช่หรือไม่?')) return;
+      state = { targetName:'', targetAmount:0, history:[] };
+      saveState(); render();
+    });
+
+    $('export-csv').addEventListener('click', ()=>{
+      if(!state.history.length){ alert('ยังไม่มีรายการที่จะส่งออก'); return; }
+      const rows = [['date','amount','note']].concat(state.history.map(it=>[it.time,it.amount,`"${(it.note||'').replace(/"/g,'""')}"`]));
+      const csv = rows.map(r=>r.join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `${(state.targetName||'savings').replace(/[^a-z0-9_-]/gi,'_')}_history.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // init
+    (function(){
+      loadState(); render();
+    })();
+  </script>
+</body>
+</html>
